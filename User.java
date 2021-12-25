@@ -1,13 +1,12 @@
 
 import java.util.ArrayList;
 
-public class User extends Person implements Subject,Observer{
+public class User extends Person /*implements Subject,Observer*/{
     ArrayList<Observer> observersDrivers =new ArrayList<>();
     public User(){}
     public User(String mobile, String userName, String email, String password) {
         super(mobile, userName, email, password,Status.valueOf("Active"));
     }
-
     public boolean register(Person p){
         if(memory.getPersons().contains(p)){
             System.out.println("User is already registered");
@@ -17,14 +16,34 @@ public class User extends Person implements Subject,Observer{
             return true;
         }
     }
-    public Rides createRide(String source,String destination){
-        Rides r=new Rides();
-        r.setSource(source);
-        r.setDestination(destination);
-        r.setUser(this);
-        memory.getRides().add(r);
-        notifyAllObserver();
-        return r;
+    public Rides createRide(String source,String destination,int numPass){
+        int f=0;
+        if(numPass>1) {
+            for (Rides r : memory.getRides()) {
+                if (r.getDestination().equalsIgnoreCase(destination) &&
+                        r.getSource().equalsIgnoreCase(source) &&
+                        r.getNumberOfPassengers() == numPass&&r.availableRide()) {
+                    r.setUser(this);
+                    if(r.getNumberOfPassengers()==r.getUser().size()) r.setavailableRide(false);
+                    return r;
+                }
+
+
+            }
+
+        }
+        if(numPass>=1) {
+            Rides r = new Rides();
+            r.setSource(source);
+            r.setDestination(destination);
+            r.setUser(this);
+            r.setNumberOfPassengers(numPass);
+            if(numPass==1) {r.setavailableRide(false);}
+            memory.getRides().add(r);
+            return r;
+        }
+        //notifyAllObserver();
+        return null;
     }
     public void setRate(Driver D,double rate){
         D.getUsersrate().put(this,rate);
@@ -32,7 +51,10 @@ public class User extends Person implements Subject,Observer{
     public float ShowavrageRate(Driver D){
         return D.getAveragerate();
     }
-    @Override
+
+}
+
+    /*@Override
     public void subscribers(Observer observer) {
         observersDrivers.add(observer);
     }
@@ -59,6 +81,4 @@ public class User extends Person implements Subject,Observer{
                 System.out.println(" offer for ride"+r.getOffer());
             }
         }
-    }
-}
-
+    }*/

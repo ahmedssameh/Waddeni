@@ -3,13 +3,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Driver extends Person implements Observer,Subject{
+public class Driver extends Person /*implements Subject/*,Subject*/{
     private int license;
     private int nationalId;
     private float averagerate;
+    private Boolean status=true;
     private Map<User,Double> usersrate=new HashMap();
     private ArrayList<String> favorite_area=new ArrayList<>();
     ArrayList<Observer> observersUser =new ArrayList<>();
+    ArrayList<Observer> observerAdmin=new ArrayList<>();
+
+    public Boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(Boolean status) {
+        this.status = status;
+    }
+
     Driver(){}
     public Driver(String mobile, String userName, String email, String password,int license,int nationalId) {
         super(mobile, userName, email, password,Status.valueOf("Suspend"));
@@ -43,7 +54,6 @@ public class Driver extends Person implements Observer,Subject{
     public ArrayList<String> getFavorite_area() {
         return favorite_area;
     }
-
     public void addFavoritesArea(String predestination) {
         favorite_area.add(predestination);
     }
@@ -56,16 +66,35 @@ public class Driver extends Person implements Observer,Subject{
         }
         return DriverRides;
     }
-
     public void setAveragerate(float averagerate) {
         this.averagerate = averagerate;
     }
     public void setMoney(Rides r,double moneypay){
         r.getOffers().put(this,moneypay);
-        notifyAllObserver();
+
+        //notifyAllObserver();
     }
-    //when driver is observer for User subject
-    @Override
+    public void ArrivedSource(Rides r){
+        r.setISArrivedDistination(true);
+    }
+    public void ArrivedDistination(Rides r){
+        r.setISArrivedDistination(true);
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+ /* @Override
     public void update() {
         for(Rides R:memory.getRides()){
             if(favorite_area.contains(R.getDestination())){
@@ -73,18 +102,17 @@ public class Driver extends Person implements Observer,Subject{
             }
         }
     }
-
-
-
     //when Set offer driver now subject
     @Override
     public void subscribers(Observer observer) {
         observersUser.add(observer);
+        observerAdmin.add(observer);
     }
 
     @Override
     public void unSubscribers(Observer observer) {
         observersUser.remove(observer);
+        observerAdmin.remove(observer);
     }
 
     @Override
@@ -92,7 +120,7 @@ public class Driver extends Person implements Observer,Subject{
         for (Observer O : observersUser) {
             O.update();
         }
-    }
-
-}
-
+        for (Observer O : observerAdmin) {
+            O.update();
+        }
+    }*/
