@@ -1,3 +1,4 @@
+package com.company;
 public class AverageDriverRate {
     float calculateAvgRate(Driver driver){
         float sum=0;int count=0;

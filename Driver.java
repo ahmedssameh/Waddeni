@@ -1,3 +1,4 @@
+package com.company;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,12 +71,12 @@ public class Driver extends Person /*implements Subject/*,Subject*/{
         this.averagerate = averagerate;
     }
     public void setMoney(Rides r,double moneypay){
-        r.getOffers().put(this,moneypay);
 
+        r.setOffers(this,moneypay);
         //notifyAllObserver();
     }
     public void ArrivedSource(Rides r){
-        r.setISArrivedDistination(true);
+        r.setISArrivedSource(true);
     }
     public void ArrivedDistination(Rides r){
         r.setISArrivedDistination(true);
