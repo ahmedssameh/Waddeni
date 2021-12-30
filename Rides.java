@@ -1,4 +1,4 @@
-
+package com.company;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,27 +26,21 @@ public class Rides implements Subject{
     public ArrayList<User> getUser() {
         return user;
     }
-
     public void setUser(User user) {
-       this.getUser().add(user);
+        this.getUser().add(user);
     }
-
     public int getNumberOfPassengers() {
         return numberOfPassengers;
     }
-
     public void setNumberOfPassengers(int numberOfPassengers) {
         this.numberOfPassengers = numberOfPassengers;
     }
-
     public boolean availableRide() {
         return availableRide;
     }
-
     public void setavailableRide(boolean availableRide) {
         availableRide= availableRide;
     }
-
     Rides(){
         this.idRide= id++;
     }
@@ -67,7 +61,6 @@ public class Rides implements Subject{
     public LocalDateTime getNow() {
         return now;
     }
-
     public void setDriver(Driver driver) {
         this.driver = driver;
         this.driver.setStatus(false);
@@ -75,11 +68,13 @@ public class Rides implements Subject{
     public void setSource(String source) {
         this.source = source;
     }
+
     public void setDestination(String destination) {
         this.destination = destination;
     }
-    public void setOffers(Map<Driver, Double> offers) {
-        this.offers = offers;
+    public void setOffers(Driver d,double n) {
+        offers.put(d,n);
+        notifyAllObserver();
     }
     public void setOffer(double offer) {
         this.offer = offer;
@@ -122,8 +117,10 @@ public class Rides implements Subject{
     }
     @Override
     public void notifyAllObserver() {
+
         for(Observer o:observersAdmin){
-            o.update();
+
+            o.update(this);
         }
     }
 }

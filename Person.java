@@ -1,3 +1,4 @@
+package com.company;
 
 public abstract class Person {
     private String mobile;
@@ -6,6 +7,8 @@ public abstract class Person {
     private String password;
     private Status stat=Status.Suspend;
     HandleData memory= Memory.getInstance();
+
+
     public Person(){}
     public Person(String mobile, String userName, String email, String password,Status s) {
         this.mobile = mobile;
@@ -17,17 +20,13 @@ public abstract class Person {
     public String getUserName() {
         return userName;
     }
-
     public void setStat(Status stat) {
         this.stat = stat;
     }
-
     public String getPassword() {
         return password;
     }
-
     public abstract boolean register(Person p);
-
     public boolean login(String user,String pass){
         boolean flag=false,W=false,Y=false;
         for(Person P:memory.getPersons()){
