@@ -1,4 +1,4 @@
-
+package com.company;
 public interface Subject {
     void subscribers(Observer observer);
     void unSubscribers(Observer observer);

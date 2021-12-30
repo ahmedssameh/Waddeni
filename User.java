@@ -1,4 +1,4 @@
-
+package com.company;
 import java.util.ArrayList;
 
 public class User extends Person /*implements Subject,Observer*/{
@@ -18,6 +18,7 @@ public class User extends Person /*implements Subject,Observer*/{
     }
     public Rides createRide(String source,String destination,int numPass){
         int f=0;
+
         if(numPass>1) {
             for (Rides r : memory.getRides()) {
                 if (r.getDestination().equalsIgnoreCase(destination) &&
@@ -34,6 +35,7 @@ public class User extends Person /*implements Subject,Observer*/{
         }
         if(numPass>=1) {
             Rides r = new Rides();
+            r.subscribers(Admin.getInstance());
             r.setSource(source);
             r.setDestination(destination);
             r.setUser(this);
