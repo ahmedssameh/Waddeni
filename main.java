@@ -1,10 +1,10 @@
 
-
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
-public class main {
+class main {
 
     public static Person getPerson(String username,String pass){
         HandleData memory= Memory.getInstance();
@@ -29,7 +29,6 @@ public class main {
         System.out.println("Enter number an operation you want choice ");
 
     }
-
     public static void driverMenu() {
         System.out.println("-----------------------------------------------------------");
         System.out.println("                Driver menu");
@@ -38,23 +37,24 @@ public class main {
         System.out.println("3-suggest a price to this ride");
         System.out.println("4-list user ratings.");
         System.out.println("5-List Rides matching your favorite area.");
-        System.out.println("6-log out");
+        System.out.println("6-Arrived Source ride");
+        System.out.println("7-Arrived Distination ride");
+        System.out.println("8-log out");
         System.out.println("-----------------------------------------------------------");
         System.out.println("Enter number an operation you want choice ");
 
     }
-
     public static void adminMenu() {
         System.out.println("-----------------------------------------------------------");
         System.out.println("               Admin menu     ");
         System.out.println("1-list all pending driver registrations");
         System.out.println("2-verify driver");
         System.out.println("3-Suspend user or driver");
-        System.out.println("4-log out");
+        System.out.println("4-Show log file for Events");
+        System.out.println("5-log out");
         System.out.println("-----------------------------------------------------------");
         System.out.println("Enter number an operation you want choice ");
     }
-
     public static void mainMenu() {
         System.out.println("-----------------------------------------------------------");
         System.out.println("                   Main menu");
@@ -63,7 +63,6 @@ public class main {
         System.out.println("-----------------------------------------------------------");
         System.out.println("Enter number an operation you want choice ");
     }
-
     public static void main(String[] args) {
         Person currentPerson=null;
         boolean is_admin=false;
@@ -72,6 +71,7 @@ public class main {
         Scanner input = new Scanner(System.in);
         HandleData memory = Memory.getInstance();
         Admin admin = Admin.getInstance();
+
         boolean verify_login=false;
         User temp=new User();
         while (true) {
@@ -130,6 +130,7 @@ public class main {
                     currentPerson = getPerson(name, password);
                 }
             }
+            //admin
             else if (num_operation == 19) {
                 while (true) {
                     System.out.println("Enter username");
@@ -142,7 +143,9 @@ public class main {
                     }
                     if (verify_login) break;
                 }
-            } else System.out.println("please choice operation from 1 and 2");
+            }
+            else System.out.println("please choice operation from 1 and 2");
+
             //admin operation
             if (is_admin && verify_login) {
                 while (true) {
@@ -184,9 +187,16 @@ public class main {
                         if(person_wanted==null){
                             System.out.println("wrong username for person ");
                         }
-                       else  admin.suspend(person_wanted);
+                        else  admin.suspend(person_wanted);
                     }
-                    else if (operation == 4) {
+                    else if (operation==4){
+                        System.out.println("-----------------AllEvents---------------------------");
+
+                        for (String S:Admin.getEvents()){
+                            System.out.println(S);
+                        }
+                    }
+                    else if (operation == 5) {
                         is_admin=false;
                         verify_login=false;
                         break;
@@ -196,7 +206,6 @@ public class main {
                     }
                 }
             }
-
             //User operation
             else if (currentPerson instanceof User&&verify_login) {
                 while (true) {
@@ -208,7 +217,7 @@ public class main {
                         String source = input.next();
                         System.out.println("Enter destination");
                         String destination = input.next();
-                        current_ride = ((User) currentPerson).createRide(source, destination);
+                        current_ride = ((User) currentPerson).createRide(source, destination,1);
                     }
                     else if (operation == 2) {
                         for(Rides r:memory.getRides()){
@@ -245,25 +254,29 @@ public class main {
                     else if(operation==4){
                         int flag=0;
                         for(Rides r:memory.getRides()){
-                            if(r.getUser().equals(currentPerson)&&!r.isEnded()){
-                                for(Map.Entry<Driver, Double> T : r.getOffers().entrySet()){
-                                    System.out.println(T.getKey().getUserName());
-                                    System.out.println(T.getKey().getAveragerate());
-                                    System.out.println(T.getValue());
-                                    System.out.println("Are you Okay with this Offer? y/n");
-                                    String Choice=input.next();
-                                    if(Choice.equals("y")){
-                                        r.setDriver(T.getKey());
-                                        r.setOffer(T.getValue());
-                                        flag=1;
-                                        break;
-                                }
-                                    else if(Choice.equals("n")) {
-                                        continue;
-                                    } else System.out.println("Enter valid Choice");
+                            for(User u:r.getUser()){
+                                if(u.equals(currentPerson)&&!r.isEnded()){
+                                    for(Map.Entry<Driver, Double> T : r.getOffers().entrySet()){
+                                        System.out.println(T.getKey().getUserName());
+                                        System.out.println(T.getKey().getAveragerate());
+                                        System.out.println(T.getValue());
+                                        System.out.println("Are you Okay with this Offer? y/n");
+                                        String Choice=input.next();
+                                        if(Choice.equals("y")){
+                                            r.setDriver(T.getKey());
+                                            r.setOffer(T.getValue());
+                                            flag=1;
+                                            break;
+                                        }
+                                        else if(Choice.equals("n")) {
+                                            continue;
+                                        }
+                                        else System.out.println("Enter valid Choice");
+                                    }
                                 }
                             }
                         }
+
                         if(flag==0) System.out.println("there no more rides matching you right now");
                     }
                     else if (operation == 5) {
@@ -342,7 +355,37 @@ public class main {
                         if(f==0)System.out.println("no ride matching your favorite area ");
 
                     }
-                    else if (operation == 6) {
+                    else if(operation==6){
+                        System.out.println("Enter id ride you wanted");
+                        int id = input.nextInt();
+                        Rides ride_wanted = null;
+                        for (Rides R : memory.getRides()) {
+                            if (R.getIdRide() == id) ride_wanted = R;
+                        }
+                        if(ride_wanted==null){
+                            System.out.println("Wrong id");
+                        }
+                        else {
+                            ((Driver) currentPerson).ArrivedSource(ride_wanted);
+
+                        }
+                    }
+                    else if(operation==7){
+                        System.out.println("Enter id ride you wanted");
+                        int id = input.nextInt();
+                        Rides ride_wanted = null;
+                        for (Rides R : memory.getRides()) {
+                            if (R.getIdRide() == id) ride_wanted = R;
+                        }
+                        if(ride_wanted==null){
+                            System.out.println("Wrong id");
+                        }
+                        else {
+                            ((Driver) currentPerson).ArrivedDistination(ride_wanted);
+
+                        }
+                    }
+                    else if (operation == 8) {
                         verify_login = false;
                     }
                     if (!verify_login) break;
