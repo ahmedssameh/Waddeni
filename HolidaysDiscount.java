@@ -1,33 +1,23 @@
-import java.text.SimpleDateFormat;
+package com.hawm.hawm.model;
+
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
-public class HolidaysDiscount extends Decorator{
-    Rides ride;
-    Set<LocalDate> holidays;
+public class HolidaysDiscount extends Decorator {
+    //RidesHelper ride;
+    static Set<LocalDate> holidays=new HashSet<>();
 
-    public void InsertAllHoliday(){
-        holidays.add(LocalDate.parse("2021/12/29"));
+    public static void InsertAllHoliday(){
+        holidays.add(LocalDate.now());
 
     }
-    HolidaysDiscount(Rides ride){
-        this.ride=ride;
+    HolidaysDiscount(RidesHelper ride){
+        this.ride=ride;InsertAllHoliday();
     }
-    @Override
-    public String getDescription() {
-        return "Holidays Discount";
-    }
+
 
     @Override
-    double cost() {
-        int f=0;
-        InsertAllHoliday();
-        for (LocalDate LD:holidays){
-            if(ride.getDate().equals(LD)){f=1;break;}
-        }
-
-        if(f==1)return super.cost()-(0.05*super.cost());
-        else return super.cost();
-    }
+    public double cost() {
+        return ride.cost()-(0.05*ride.cost());}
 }
