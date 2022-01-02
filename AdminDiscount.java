@@ -1,24 +1,16 @@
-import java.util.ArrayList;
+package com.hawm.hawm.model;
 
-public class AdminDiscount extends Decorator{
-    Rides ride;
-    AdminDiscount(Rides ride){
+public class AdminDiscount extends Decorator {
+    //RidesHelper ride;
+    AdminDiscount(RidesHelper ride){
         this.ride=ride;
     }
-    @Override
-    public String getDescription() {
-        return "Admin Discount";
-    }
+
 
     @Override
-    double cost() {
-            int f=0;
-        for(String S: Admin.getDiscountPlaces()){
-            if (ride.getDestination().equalsIgnoreCase(S)){
-                f=1;break;
-            }
-        }
-        if(f==1) return super.cost()-(0.1*super.cost());
-        else return super.cost();
+    public double cost() {
+        return ride.cost()-(0.1*ride.cost());
+
     }
 }
+
