@@ -1,18 +1,37 @@
-package com.company;
+package com.hawm.hawm.model;
+
+
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
+@Repository("driver")
 public class Driver extends Person /*implements Subject/*,Subject*/{
     private int license;
     private int nationalId;
-    private float averagerate;
+    private float averagerate=0;
     private Boolean status=true;
+    private double Balance=0;
     private Map<User,Double> usersrate=new HashMap();
     private ArrayList<String> favorite_area=new ArrayList<>();
     ArrayList<Observer> observersUser =new ArrayList<>();
     ArrayList<Observer> observerAdmin=new ArrayList<>();
+
+
+    public void setBalance(double balance) {
+        Balance += balance;
+    }
+
+    public double getBalance() {
+        return Balance;
+    }
 
     public Boolean getStatus() {
         return status;
@@ -22,13 +41,15 @@ public class Driver extends Person /*implements Subject/*,Subject*/{
         this.status = status;
     }
 
-    Driver(){}
-    public Driver(String mobile, String userName, String email, String password,int license,int nationalId) {
-        super(mobile, userName, email, password,Status.valueOf("Suspend"));
+    public Driver(){}
+
+    public Driver(@JsonProperty String mobile,@JsonProperty String userName, @JsonProperty String email,
+                  @JsonProperty String password, @JsonProperty int license,@JsonProperty int nationalId) {
+        super(mobile, userName, email, password, Status.valueOf("Suspend"));
         this.license=license;
         this.nationalId=nationalId;
     }
-    public boolean  register(Person d){
+    public boolean  register(@Qualifier("driver") Person d){
         if(memory.getPersons().contains(d)){
             System.out.println("Driver is already registered");
             return false;
@@ -52,6 +73,7 @@ public class Driver extends Person /*implements Subject/*,Subject*/{
         r.calculateAvgRate(this);
         return averagerate;
     }
+
     public ArrayList<String> getFavorite_area() {
         return favorite_area;
     }
@@ -61,7 +83,7 @@ public class Driver extends Person /*implements Subject/*,Subject*/{
     public ArrayList<Rides> showRidesForSpecificArea(String predestination) {
         ArrayList<Rides>  DriverRides=new ArrayList<>();
         for(Rides r:memory.getRides()){
-            if(r.getDestination().equalsIgnoreCase(predestination)){
+            if(r.Details.getDestination().equalsIgnoreCase(predestination)){
                 DriverRides.add(r);
             }
         }
@@ -75,13 +97,6 @@ public class Driver extends Person /*implements Subject/*,Subject*/{
         r.setOffers(this,moneypay);
         //notifyAllObserver();
     }
-    public void ArrivedSource(Rides r){
-        r.setISArrivedSource(true);
-    }
-    public void ArrivedDistination(Rides r){
-        r.setISArrivedDistination(true);
-    }
-
 }
 
 

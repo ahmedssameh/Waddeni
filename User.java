@@ -1,13 +1,22 @@
-package com.company;
-import java.util.ArrayList;
+package com.hawm.hawm.model;
 
-public class User extends Person /*implements Subject,Observer*/{
-    ArrayList<Observer> observersDrivers =new ArrayList<>();
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+@RestController
+//@CrossOrigin("*")
+public class User extends Person {
+    //@Autowired
+    LocalDate birthday=LocalDate.now();
+    public boolean IsFirstRide=true;
     public User(){}
-    public User(String mobile, String userName, String email, String password) {
-        super(mobile, userName, email, password,Status.valueOf("Active"));
+    public User(@JsonProperty String mobile, @JsonProperty String userName,@JsonProperty String email,
+                @JsonProperty String password) {
+        super(mobile, userName, email, password, Status.valueOf("Active"));
     }
-    public boolean register(Person p){
+    @GetMapping(value="register")
+    public boolean register(@RequestBody Person p){
         if(memory.getPersons().contains(p)){
             System.out.println("User is already registered");
             return false;
@@ -16,71 +25,40 @@ public class User extends Person /*implements Subject,Observer*/{
             return true;
         }
     }
-    public Rides createRide(String source,String destination,int numPass){
+    @PostMapping(value = "creatRide")
+    public Rides createRide( @RequestParam(name="source") String source, @RequestParam(name="destination") String destination, @RequestParam(name="numPass")  int numPass){
         int f=0;
-
         if(numPass>1) {
             for (Rides r : memory.getRides()) {
-                if (r.getDestination().equalsIgnoreCase(destination) &&
-                        r.getSource().equalsIgnoreCase(source) &&
-                        r.getNumberOfPassengers() == numPass&&r.availableRide()) {
-                    r.setUser(this);
-                    if(r.getNumberOfPassengers()==r.getUser().size()) r.setavailableRide(false);
+                if (r.Details.getDestination().equalsIgnoreCase(destination) &&
+                        r.Details.getSource().equalsIgnoreCase(source) &&
+                        r.getNumberOfPassengers() == numPass&&r.Details.availableRide()) {
+                    r.Details.setUser(this);
+                    if(r.getNumberOfPassengers()==r.Details.getUser().size()) r.Details.setavailableRide(false);
                     return r;
                 }
-
-
             }
-
         }
         if(numPass>=1) {
             Rides r = new Rides();
             r.subscribers(Admin.getInstance());
-            r.setSource(source);
-            r.setDestination(destination);
-            r.setUser(this);
+            r.Details.setSource(source);
+            r.Details.setDestination(destination);
+            r.Details.setUser(this);
             r.setNumberOfPassengers(numPass);
-            if(numPass==1) {r.setavailableRide(false);}
+            if(numPass==1) {r.Details.setavailableRide(false);}
             memory.getRides().add(r);
             return r;
         }
-        //notifyAllObserver();
         return null;
     }
-    public void setRate(Driver D,double rate){
+    @PutMapping(value="setRate")
+    public void setRate(@RequestBody Driver D, @RequestParam(name="rate")double rate){
         D.getUsersrate().put(this,rate);
     }
-    public float ShowavrageRate(Driver D){
+    @GetMapping(value="showavgrate")
+    public float ShowavrageRate(@RequestBody Driver D){
         return D.getAveragerate();
     }
-
 }
 
-    /*@Override
-    public void subscribers(Observer observer) {
-        observersDrivers.add(observer);
-    }
-
-    @Override
-    public void unSubscribers(Observer observer) {
-        observersDrivers.remove(observer);
-    }
-
-    @Override
-    public void notifyAllObserver() {
-        for(Observer O: observersDrivers){
-            O.update();
-        }
-    }
-
-
-
-    @Override
-    public void update() {
-        for(Rides r:memory.getRides()){
-            if(r.getUser().equals(this)){
-                //r.getOffers().add(" offer for ride"+r.getOffer());
-                System.out.println(" offer for ride"+r.getOffer());
-            }
-        }
-    }*/
