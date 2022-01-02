@@ -1,48 +1,61 @@
-package com.company;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Timer;
+package com.hawm.hawm.model;
 
-public class Rides implements Subject{
+import java.time.LocalDate;
+import java.util.*;
+public  class Rides implements Subject, RidesHelper {
     ArrayList<Observer> observersAdmin=new ArrayList<>();
     private static int id=0;
     private int idRide;
-    private String source;
-    private String destination;
     private double offer=-1;
-    private boolean ended=false;
-    private int numberOfPassengers;
-    private boolean availableRide =true;
-    private ArrayList<User> user=new ArrayList<>();
-    private Driver driver=null;
-    private LocalDateTime now = LocalDateTime.now();
+    private Map<Driver,Double> offers=new HashMap<>();
+    private int numberOfPassengers;;
     private boolean ISArrivedSource=false;
     private boolean ISArrivedDistination=false;
-    private Map<Driver,Double> offers=new HashMap<>();
-
-
-    public ArrayList<User> getUser() {
-        return user;
-    }
-    public void setUser(User user) {
-        this.getUser().add(user);
-    }
-    public int getNumberOfPassengers() {
-        return numberOfPassengers;
-    }
-    public void setNumberOfPassengers(int numberOfPassengers) {
-        this.numberOfPassengers = numberOfPassengers;
-    }
-    public boolean availableRide() {
-        return availableRide;
-    }
-    public void setavailableRide(boolean availableRide) {
-        availableRide= availableRide;
-    }
+    public RideDetails Details=new RideDetails();
     Rides(){
         this.idRide= id++;
+    }
+    public void Discounts(RidesHelper r){
+        if(this.Details.getUser().size()>=2){
+            System.out.println(1);
+            r=new TwoPassengersDiscount(r);
+            //offer=r.cost();
+        }
+        for(LocalDate LD:HolidaysDiscount.holidays) {
+            if (this.Details.getDate().equals(LD)) {
+                System.out.println(2);
+                r = new HolidaysDiscount(r);
+            }
+        }
+        for(User u:this.Details.getUser()) {
+            if (u.IsFirstRide){
+                System.out.println(3);
+                u.IsFirstRide=false;
+                r=new FirstRideDiscount(r);
+                //offer=r.cost();
+                break;}
+        }
+        for(String S: Admin.getDiscountPlaces()) {
+
+            if (this.Details.getDestination().equalsIgnoreCase(S)){
+                System.out.println(4);
+                r=new AdminDiscount(r);
+                //offer=r.cost();
+                break;
+            }
+        }
+        for(User u:this.Details.getUser()) {
+            if (u.birthday.equals(LocalDate.now())){
+                System.out.println(5);
+                r=new BirthdayDiscount(r);
+
+                break;}
+        }
+        offer=r.cost();
+    }
+    public double cost(){return offer;}
+    public int getNumberOfPassengers() {
+        return numberOfPassengers;
     }
     public boolean isISArrivedSource() {
         return ISArrivedSource;
@@ -58,19 +71,14 @@ public class Rides implements Subject{
         this.ISArrivedDistination = ISArrivedDistination;
         notifyAllObserver();
     }
-    public LocalDateTime getNow() {
-        return now;
+    public void setNumberOfPassengers(int numberOfPassengers) {
+        this.numberOfPassengers = numberOfPassengers;
     }
-    public void setDriver(Driver driver) {
-        this.driver = driver;
-        this.driver.setStatus(false);
+    public double getOffer() {
+        return offer;
     }
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    public void setDestination(String destination) {
-        this.destination = destination;
+    public int getIdRide() {
+        return idRide;
     }
     public void setOffers(Driver d,double n) {
         offers.put(d,n);
@@ -78,34 +86,13 @@ public class Rides implements Subject{
     }
     public void setOffer(double offer) {
         this.offer = offer;
+        this.Details.getDriver().setBalance(offer);
         notifyAllObserver();
-    }
-    public static int getId() {
-        return id;
-    }
-    public void setEnded(boolean ended) {
-        this.ended = ended;
-    }
-    public Driver getDriver() {
-        return driver;
+        Discounts(this);
+
     }
     public Map<Driver, Double> getOffers() {
         return offers;
-    }
-    public String getDestination() {
-        return destination;
-    }
-    public String getSource() {
-        return source;
-    }
-    public boolean isEnded() {
-        return ended;
-    }
-    public double getOffer() {
-        return offer;
-    }
-    public int getIdRide() {
-        return idRide;
     }
     @Override
     public void subscribers(Observer observer) {
@@ -124,4 +111,5 @@ public class Rides implements Subject{
         }
     }
 }
+
 
